@@ -60,9 +60,8 @@ jobs:
     - name: Install GLFW dependencies for Linux
       shell: bash
       run: |
-        if matrix.os == 'ubuntu-latest' then
+        if [matrix.os == 'ubuntu-latest']; then
           sudo apt install libwayland-dev libxkbcommon-dev xorg-dev
-        fi
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
