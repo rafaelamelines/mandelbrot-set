@@ -17,15 +17,15 @@ struct Colour {
     float r, g, b;
 };
 
-Colour colours[64];
+Colour colours[128];
 
 void populateColours() {
-    for (size_t i = 0; i < 32; i++) {
-        colours[i] =  { 0.0f, 0.0f, (float)i / 64.0f };
+    for (size_t i = 0; i < 64; i++) {
+        colours[i] =  { 0.0f, 0.0f, (float)i / 128.0f };
     }
 
-    for (size_t i = 0; i < 32; i++) {
-        colours[i + 32] = { (float)i / 64.0f, (float)i / 64.0f, 1.0f };
+    for (size_t i = 0; i < 64; i++) {
+        colours[i + 64] = { (float)i / 128.0f, (float)i / 128.0f, 1.0f };
     }
 }
 
@@ -105,7 +105,7 @@ int main() {
 
     populateColours();
 
-    for (size_t i = 0; i < 64; i++) {
+    for (size_t i = 0; i < 128; i++) {
         Colour colour = colours[i];
         GLint colourUniform = glGetUniformLocation(mandelShader.getShaderProgram(), ("COLOURS[" + std::to_string(i) + "]").c_str());
         glUniform4f(colourUniform, colour.r, colour.g, colour.b, 1.0f);

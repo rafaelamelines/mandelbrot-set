@@ -1,7 +1,7 @@
 #version 330 core
 out vec4 FragColor;
 
-uniform vec4 COLOURS[64];
+uniform vec4 COLOURS[128];
 uniform int MAX_ITERATIONS;
 uniform float THRESHOLD;
 uniform vec2 WINDOW_DIMENSIONS;
@@ -20,5 +20,5 @@ void main() {
         iterationCount++;
     }
 
-    FragColor = COLOURS[iterationCount % 64];
+    FragColor = COLOURS[iterationCount % 128];
 }
