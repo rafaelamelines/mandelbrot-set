@@ -2,6 +2,8 @@
 
 void input_handler::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+    windowWidth = width;
+    windowHeight = height;
 }
 
 void input_handler::mouse_pos_callback(GLFWwindow* window, double x, double y) {
@@ -31,7 +33,7 @@ void input_handler::mouse_button_callback(GLFWwindow* window, int button, int ac
 
 void input_handler::scroll_callback(GLFWwindow* window, [[maybe_unused]]double dx, double dy) {
     glfwGetCursorPos(window, &cursorX, &cursorY);
-    cursorY = (double)WINDOW_SIZE - cursorY;
+    cursorY = (double)windowHeight - cursorY;
 
     if (dy > 0) {
         originX = (originX - cursorX) * ZOOM_FACTOR + cursorX;

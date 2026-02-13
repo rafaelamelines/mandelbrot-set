@@ -13,11 +13,11 @@
 
 const std::string BASE_PATH = std::filesystem::current_path().parent_path().string() + '/';
 
-const size_t WINDOW_SIZE = 800;
+size_t windowWidth = 800, windowHeight = 800;
 
 float scaleFactor = 200.0f;
-double originX = (double)WINDOW_SIZE / 2.0;
-double originY = (double)WINDOW_SIZE / 2.0;
+double originX = (double)windowWidth / 2.0;
+double originY = (double)windowHeight / 2.0;
 
 struct Colour {
     float r, g, b;
@@ -49,7 +49,7 @@ int main() {
 
     glfwSetErrorCallback(logger::GLFWErrorCallback);
 
-    GLFWwindow* window = glfwCreateWindow(WINDOW_SIZE, WINDOW_SIZE, "Mandelbrot set", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Mandelbrot set", nullptr, nullptr);
     if (!window) {
         MANDEL_ERROR("Failed to create GLFW window");
         glfwTerminate();
@@ -114,9 +114,6 @@ int main() {
 
     glBindVertexArray(0);
 
-    GLint windowDimensionsUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "WINDOW_DIMENSIONS");
-    glUniform2f(windowDimensionsUniform, (float)WINDOW_SIZE, (float)WINDOW_SIZE);
-
     GLint maxIterationsUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "MAX_ITERATIONS");
     glUniform1i(maxIterationsUniform, 128);
 
@@ -128,7 +125,7 @@ int main() {
 
     populateColours(mandelShader);
 
-    input_handler::framebuffer_size_callback(window, WINDOW_SIZE, WINDOW_SIZE);
+    input_handler::framebuffer_size_callback(window, windowWidth, windowHeight);
 
     while (!glfwWindowShouldClose(window)) {
         input_handler::processInput(window);
@@ -136,6 +133,9 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         mandelShader.use();
+
+        GLint windowDimensionsUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "WINDOW_DIMENSIONS");
+        glUniform2f(windowDimensionsUniform, (float)windowWidth, (float)windowHeight);
 
         GLint scaleFactorUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "scaleFactor");
         glUniform1f(scaleFactorUniform, scaleFactor);

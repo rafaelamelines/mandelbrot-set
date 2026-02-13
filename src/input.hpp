@@ -3,7 +3,7 @@
 
 #include "cursor.hpp"
 
-extern const size_t WINDOW_SIZE;
+extern size_t windowWidth, windowHeight;
 
 extern float scaleFactor;
 extern double originX, originY;
