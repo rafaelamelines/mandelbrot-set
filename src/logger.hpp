@@ -3,8 +3,6 @@
 #include <ctime>
 #include <iostream>
 #include <string>
-#include <fstream>
-#include <sstream>
 
 #define MANDEL_LOG(...) logger::log(__FILE__, __LINE__, __VA_ARGS__)
 #define MANDEL_WARN(...) logger::warn(__FILE__, __LINE__, __VA_ARGS__)

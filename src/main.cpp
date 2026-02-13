@@ -6,10 +6,16 @@
 #include "logger.hpp"
 #include "shader.hpp"
 #include "input.hpp"
+#include "cursor.hpp"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+const std::string BASE_PATH = std::filesystem::current_path().parent_path().string() + '/';
 
 const size_t WINDOW_SIZE = 800;
 
-float scaleFactor = 100.0f;
+float scaleFactor = 200.0f;
 double originX = (double)WINDOW_SIZE / 2.0;
 double originY = (double)WINDOW_SIZE / 2.0;
 
@@ -17,15 +23,17 @@ struct Colour {
     float r, g, b;
 };
 
-Colour colours[128];
-
-void populateColours() {
+void populateColours(Shader shader) {
     for (size_t i = 0; i < 64; i++) {
-        colours[i] =  { 0.0f, 0.0f, (float)i / 128.0f };
+        Colour colour =  { 0.0f, 0.0f, (float)i / 128.0f };
+        GLint colourUniform = glGetUniformLocation(shader.getShaderProgram(), ("COLOURS[" + std::to_string(i) + "]").c_str());
+        glUniform4f(colourUniform, colour.r, colour.g, colour.b, 1.0f);
     }
 
     for (size_t i = 0; i < 64; i++) {
-        colours[i + 64] = { (float)i / 128.0f, (float)i / 128.0f, 1.0f };
+        Colour colour = { (float)i / 128.0f, (float)i / 128.0f, 1.0f };
+        GLint colourUniform = glGetUniformLocation(shader.getShaderProgram(), ("COLOURS[" + std::to_string(i + 64) + "]").c_str());
+        glUniform4f(colourUniform, colour.r, colour.g, colour.b, 1.0f);
     }
 }
 
@@ -39,12 +47,25 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
+    glfwSetErrorCallback(logger::GLFWErrorCallback);
+
     GLFWwindow* window = glfwCreateWindow(WINDOW_SIZE, WINDOW_SIZE, "Mandelbrot set", nullptr, nullptr);
     if (!window) {
         MANDEL_ERROR("Failed to create GLFW window");
         glfwTerminate();
         return 1;
     }
+
+    {
+        int iconWidth, iconHeight;
+        unsigned char* iconData = stbi_load((BASE_PATH + "resources/icon.png").c_str(), &iconWidth, &iconHeight, nullptr, STBI_rgb_alpha);
+
+        GLFWimage icon(iconWidth, iconHeight, iconData);
+
+        glfwSetWindowIcon(window, 1, &icon);
+    }
+
+    cursor::init();
 
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, input_handler::framebuffer_size_callback);
@@ -58,8 +79,7 @@ int main() {
     }
 
     Shader mandelShader;
-    std::string basePath = std::filesystem::current_path().parent_path().string() + '/';
-    mandelShader.load(basePath + "shader/mandel.vert.glsl", basePath + "shader/mandel.frag.glsl");
+    mandelShader.load(BASE_PATH + "shader/mandel.vert.glsl", BASE_PATH + "shader/mandel.frag.glsl");
     mandelShader.use();
 
     float vertices[] = {
@@ -103,13 +123,10 @@ int main() {
     GLint thresholdUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "THRESHOLD");
     glUniform1f(thresholdUniform, 16.0f);
 
-    populateColours();
+    GLint pUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "P");
+    glUniform1i(pUniform, 2);
 
-    for (size_t i = 0; i < 128; i++) {
-        Colour colour = colours[i];
-        GLint colourUniform = glGetUniformLocation(mandelShader.getShaderProgram(), ("COLOURS[" + std::to_string(i) + "]").c_str());
-        glUniform4f(colourUniform, colour.r, colour.g, colour.b, 1.0f);
-    }
+    populateColours(mandelShader);
 
     input_handler::framebuffer_size_callback(window, WINDOW_SIZE, WINDOW_SIZE);
 
