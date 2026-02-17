@@ -15,7 +15,7 @@ public:
 
     void load(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
 
-    unsigned int getShaderProgram();
+    GLuint getShaderProgram() const;
 
     void use();
 

@@ -1,5 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
 
 #include <filesystem>
 
@@ -7,35 +10,18 @@
 #include "shader.hpp"
 #include "input.hpp"
 #include "cursor.hpp"
+#include "colour.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 const std::string BASE_PATH = std::filesystem::current_path().parent_path().string() + '/';
 
-size_t windowWidth = 800, windowHeight = 800;
+size_t windowWidth = 1200, windowHeight = 800;
 
 float scaleFactor = 200.0f;
-double originX = (double)windowWidth / 2.0;
+double originX = (double)windowWidth / 2.0 + 200.0;
 double originY = (double)windowHeight / 2.0;
-
-struct Colour {
-    float r, g, b;
-};
-
-void populateColours(Shader shader) {
-    for (size_t i = 0; i < 64; i++) {
-        Colour colour =  { 0.0f, 0.0f, (float)i / 128.0f };
-        GLint colourUniform = glGetUniformLocation(shader.getShaderProgram(), ("COLOURS[" + std::to_string(i) + "]").c_str());
-        glUniform4f(colourUniform, colour.r, colour.g, colour.b, 1.0f);
-    }
-
-    for (size_t i = 0; i < 64; i++) {
-        Colour colour = { (float)i / 128.0f, (float)i / 128.0f, 1.0f };
-        GLint colourUniform = glGetUniformLocation(shader.getShaderProgram(), ("COLOURS[" + std::to_string(i + 64) + "]").c_str());
-        glUniform4f(colourUniform, colour.r, colour.g, colour.b, 1.0f);
-    }
-}
 
 int main() {
     glfwInit();
@@ -114,25 +100,79 @@ int main() {
 
     glBindVertexArray(0);
 
-    GLint maxIterationsUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "MAX_ITERATIONS");
-    glUniform1i(maxIterationsUniform, 128);
-
-    GLint thresholdUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "THRESHOLD");
-    glUniform1f(thresholdUniform, 16.0f);
-
-    GLint pUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "P");
-    glUniform1i(pUniform, 2);
-
     populateColours(mandelShader);
 
-    input_handler::framebuffer_size_callback(window, windowWidth, windowHeight);
+    glViewport(0, 0, windowWidth, windowHeight);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        io.IniFilename = NULL;
+    }
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
 
     while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
         input_handler::processInput(window);
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::SetNextWindowSize({ 400, (float)windowHeight });
+        ImGui::SetNextWindowPos({ 0, 0 });
+        ImGui::Begin("##settings", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+        ImGui::Text("Multibrot set with exponent");
+        static int p = 2;
+        if (ImGui::InputInt("##multibrot", &p, 1, 1))
+            if (p < 1)
+                p = 1;
+
+        ImGui::SeparatorText("");
+
+        ImGui::Text("Colour");
+
+        if (ImGui::RadioButton("Red", &colour, 1))
+            populateColours(mandelShader);
+        if (ImGui::RadioButton("Green", &colour, 2))
+            populateColours(mandelShader);
+        if (ImGui::RadioButton("Blue", &colour, 4))
+            populateColours(mandelShader);
+        if (ImGui::RadioButton("Yellow", &colour, 3))
+            populateColours(mandelShader);
+        if (ImGui::RadioButton("Pink", &colour, 5))
+            populateColours(mandelShader);
+        if (ImGui::RadioButton("Cyan", &colour, 6))
+            populateColours(mandelShader);
+        if (ImGui::RadioButton("White", &colour, 7))
+            populateColours(mandelShader);
+
+        ImGui::SeparatorText("");
+
+        ImGui::Text("Threshold");
+
+        static float threshold = 16.0f;
+        if (ImGui::InputFloat("##threshold", &threshold))
+            if (threshold < 0.0f)
+                threshold = 0.0f;
+
+        GLint thresholdUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "threshold");
+        glUniform1f(thresholdUniform, threshold);
+
+        ImGui::End();
 
         glClear(GL_COLOR_BUFFER_BIT);
 
         mandelShader.use();
+
+        GLint pUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "p");
+        glUniform1i(pUniform, p);
 
         GLint windowDimensionsUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "WINDOW_DIMENSIONS");
         glUniform2f(windowDimensionsUniform, (float)windowWidth, (float)windowHeight);
@@ -146,14 +186,20 @@ int main() {
         glBindVertexArray(vertexArrayObject);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window);
-        glfwPollEvents();
     }
 
     glDeleteVertexArrays(1, &vertexArrayObject);
     glDeleteBuffers(1, &vertexBufferObject);
     glDeleteBuffers(1, &elementBufferObject);
     glDeleteProgram(mandelShader.getShaderProgram());
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     glfwTerminate();
 }

@@ -33,7 +33,7 @@ void Shader::load(const std::string& vertexShaderPath, const std::string& fragme
     glDeleteShader(fragmentShader.value());
 }
 
-unsigned int Shader::getShaderProgram() {
+GLuint Shader::getShaderProgram() const {
     return shaderProgram;
 }
 
