@@ -2,6 +2,7 @@
 [![Linux](https://github.com/rafaelamelines/mandelbrot-set/actions/workflows/linux.yml/badge.svg)](https://github.com/rafaelamelines/mandelbrot-set/actions/workflows/linux.yml)
 [![MacOS](https://github.com/rafaelamelines/mandelbrot-set/actions/workflows/macos.yml/badge.svg)](https://github.com/rafaelamelines/mandelbrot-set/actions/workflows/macos.yml)
 [![Windows](https://github.com/rafaelamelines/mandelbrot-set/actions/workflows/windows.yml/badge.svg)](https://github.com/rafaelamelines/mandelbrot-set/actions/workflows/windows.yml)
+
 Performant rendering of the Mandelbrot Set using OpenGL.
 
 <img width="1448" height="1048" alt="mandelbrot" src="https://github.com/user-attachments/assets/aa600476-5698-449c-8bdb-615a13247abf" />
