@@ -17,7 +17,7 @@ jobs:
 
             matrix:
                 build_type: [Debug, Release]
-                compiler: [g++, clang, cl]
+                compiler: [g++, clang++, cl]
 
         steps:
           - uses: actions/checkout@v4
@@ -27,6 +27,7 @@ jobs:
 
           - name: Configure CMake
             run: >
+                mkdir build && cd build &&
                 cmake -B ${{ github.workspace }}/build
                 -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
                 -DCMAKE_CXX_STANDARD=23
