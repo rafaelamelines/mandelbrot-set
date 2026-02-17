@@ -1,0 +1,45 @@
+name: Linux
+
+permissions:
+  contents: read
+
+on: [push, pull_request]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                shell: bash
+
+        strategy:
+            fail-fast: false
+
+            matrix:
+                build_type: [Debug, Release]
+                compiler: [g++, clang]
+
+        steps:
+          - uses: actions/checkout@v4
+            with:
+                fetch-depth: 0
+                submodules: recursive
+
+          - name: Install GLFW dependencies
+            run: |
+                sudo apt-get update && sudo apt install libwayland-dev libxkbcommon-dev xorg-dev
+
+          - name: Configure CMake
+            run: >
+                cmake -B ${{ github.workspace }}/build
+                -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
+                -DCMAKE_CXX_STANDARD=23
+                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+                -S ${{ github.workspace }}
+
+          - name: Build
+            run: cmake --build ${{ github.workspace }}/build --config ${{ matrix.build_type }}
+
+          - name: Test
+            working-directory: ${{ github.workspace }}/build
+            run: ctest --build-config ${{ matrix.build_type }}
