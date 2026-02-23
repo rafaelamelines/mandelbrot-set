@@ -7,7 +7,15 @@ uniform int MAX_ITERATIONS = 128;
 uniform float threshold;
 uniform float scaleFactor;
 uniform vec2 originWindowCoords;
-uniform int p;
+uniform float p;
+
+vec2 complex_pow(vec2 a, float n) {
+    float arg = atan(a.y, a.x);
+    float modulus = length(a);
+    float re = pow(modulus, n) * cos(n * arg);
+    float im = pow(modulus, n) * sin(n * arg);
+    return vec2(re, im);
+}
 
 void main() {
     vec2 c = (gl_FragCoord.xy - originWindowCoords) / scaleFactor;
@@ -15,11 +23,7 @@ void main() {
 
     int iterationCount = 0;
     while (length(z) <= threshold && iterationCount < MAX_ITERATIONS) {
-        vec2 z_temp = z;
-        for (int i = 0; i < p - 1; i++)
-            z_temp = vec2(z_temp.x * z.x - z_temp.y * z.y, z_temp.x * z.y + z.x * z_temp.y);
-        z_temp += c;
-        z = z_temp;
+        z = complex_pow(z, p) + c;
         iterationCount++;
     }
 

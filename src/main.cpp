@@ -5,6 +5,7 @@
 #include <backends/imgui_impl_opengl3.h>
 
 #include <filesystem>
+#include <string>
 
 #include "logger.hpp"
 #include "shader.hpp"
@@ -129,10 +130,10 @@ int main() {
         ImGui::Begin("##settings", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
         ImGui::Text("Multibrot set with exponent");
-        static int p = 2;
-        if (ImGui::InputInt("##multibrot", &p, 1, 1))
-            if (p < 1)
-                p = 1;
+        static float p = 2.0f;
+        if (ImGui::SliderFloat("##multibrot", &p, 0.0f, 10.0f))
+            if (p < 0.0f)
+                p = 0.0f;
 
         ImGui::SeparatorText("");
 
@@ -172,7 +173,7 @@ int main() {
         mandelShader.use();
 
         GLint pUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "p");
-        glUniform1i(pUniform, p);
+        glUniform1f(pUniform, p);
 
         GLint windowDimensionsUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "WINDOW_DIMENSIONS");
         glUniform2f(windowDimensionsUniform, (float)windowWidth, (float)windowHeight);
