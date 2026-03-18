@@ -13,6 +13,8 @@ uniform float root;
 uniform float realCoefficient;
 uniform float imaginaryCoefficient;
 
+uniform vec2 init;
+
 vec2 complexPow(vec2 complexNum, float exponent) {
     float sqrMagnitude = dot(complexNum, complexNum);
     float sqrMagnitudeToPower = pow(sqrMagnitude, exponent / root);
@@ -25,7 +27,7 @@ vec2 complexPow(vec2 complexNum, float exponent) {
 
 void main() {
     vec2 c = (gl_FragCoord.xy - originWindowCoords) / scaleFactor;
-    vec2 z = vec2(0.0, 0.0);
+    vec2 z = init;
 
     int iterationCount = 0;
     while (dot(z, z) <= threshold && iterationCount < MAX_ITERATIONS) {

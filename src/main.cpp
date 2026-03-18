@@ -228,8 +228,9 @@ int main() {
             root = 2.0f;
         }
 
+        ImGui::SeparatorText("");
+
         if (julia) {
-            ImGui::SeparatorText("");
             if (ImGui::Button("Return to Mandelbrot set")) {
                 julia = false;
 
@@ -238,6 +239,14 @@ int main() {
 
                 populateColours(mandelShader);
             }
+        } else {
+            ImGui::Text("Initial value");
+
+            static float z[2] = { 0.0f, 0.0f };
+            ImGui::InputFloat2("##initialmandelvalue", z);
+
+            GLint initUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "init");
+            glUniform2f(initUniform, z[0], z[1]);
         }
 
         ImGui::End();
