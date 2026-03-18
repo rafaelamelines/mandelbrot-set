@@ -24,6 +24,10 @@ float scaleFactor = 200.0f;
 double originX = (double)windowWidth / 2.0 + 200.0;
 double originY = (double)windowHeight / 2.0;
 
+Shader mandelShader;
+
+bool julia = false;
+
 int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -65,7 +69,6 @@ int main() {
         return 1;
     }
 
-    Shader mandelShader;
     mandelShader.load(BASE_PATH + "shader/mandel.vert.glsl", BASE_PATH + "shader/mandel.frag.glsl");
     mandelShader.use();
 
@@ -129,11 +132,17 @@ int main() {
         ImGui::SetNextWindowPos({ 0, 0 });
         ImGui::Begin("##settings", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-        ImGui::Text("Multibrot set with exponent");
+        ImGui::Text(julia ? "Multi-Julia set with exponent" : "Multibrot set with exponent");
         static float p = 2.0f;
         if (ImGui::SliderFloat("##multibrot", &p, 0.0f, 10.0f))
             if (p < 0.0f)
                 p = 0.0f;
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Reset##multibrotreset")) {
+            p = 2.0f;
+        }
 
         ImGui::SeparatorText("");
 
@@ -159,12 +168,77 @@ int main() {
         ImGui::Text("Threshold");
 
         static float threshold = 16.0f;
-        if (ImGui::InputFloat("##threshold", &threshold))
+        if (ImGui::SliderFloat("##threshold", &threshold, 0.0f, 128.0f))
             if (threshold < 0.0f)
                 threshold = 0.0f;
 
+        ImGui::SameLine();
+
+        if (ImGui::Button("Reset##thresholdreset")) {
+            threshold = 16.0f;
+        }
+
         GLint thresholdUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "threshold");
         glUniform1f(thresholdUniform, threshold);
+
+        ImGui::SeparatorText("");
+
+        ImGui::Text("Real Coefficient");
+
+        static float realCoefficient = 1.0f;
+        ImGui::SliderFloat("##real", &realCoefficient, -16.0f, 16.0f);
+
+        GLint realUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "realCoefficient");
+        glUniform1f(realUniform, realCoefficient);
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Reset##realreset")) {
+            realCoefficient = 1.0f;
+        }
+        ImGui::SeparatorText("");
+
+        ImGui::Text("Imaginary Coefficient");
+
+        static float imaginaryCoefficient = 1.0f;
+        ImGui::SliderFloat("##imag", &imaginaryCoefficient, -16.0f, 16.0f);
+
+        GLint imagUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "imaginaryCoefficient");
+        glUniform1f(imagUniform, imaginaryCoefficient);
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Reset##imagreset")) {
+            imaginaryCoefficient = 1.0f;
+        }
+
+        ImGui::SeparatorText("");
+
+        ImGui::Text("Root");
+
+        static float root = 2.0f;
+        ImGui::SliderFloat("##root", &root, 0.0f, 8.0f);
+
+        GLint rootUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "root");
+        glUniform1f(rootUniform, root);
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Reset##rootreset")) {
+            root = 2.0f;
+        }
+
+        if (julia) {
+            ImGui::SeparatorText("");
+            if (ImGui::Button("Return to Mandelbrot set")) {
+                julia = false;
+
+                mandelShader.load(BASE_PATH + "shader/mandel.vert.glsl", BASE_PATH + "shader/mandel.frag.glsl");
+                mandelShader.use();
+
+                populateColours(mandelShader);
+            }
+        }
 
         ImGui::End();
 
@@ -196,7 +270,6 @@ int main() {
     glDeleteVertexArrays(1, &vertexArrayObject);
     glDeleteBuffers(1, &vertexBufferObject);
     glDeleteBuffers(1, &elementBufferObject);
-    glDeleteProgram(mandelShader.getShaderProgram());
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

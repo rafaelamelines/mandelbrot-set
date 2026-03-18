@@ -7,11 +7,14 @@ uniform int MAX_ITERATIONS = 128;
 uniform float threshold;
 uniform float scaleFactor;
 uniform vec2 originWindowCoords;
+
 uniform float p;
 
 uniform float root;
 uniform float realCoefficient;
 uniform float imaginaryCoefficient;
+
+uniform vec2 c;
 
 vec2 complexPow(vec2 complexNum, float exponent) {
     float sqrMagnitude = dot(complexNum, complexNum);
@@ -24,8 +27,7 @@ vec2 complexPow(vec2 complexNum, float exponent) {
 }
 
 void main() {
-    vec2 c = (gl_FragCoord.xy - originWindowCoords) / scaleFactor;
-    vec2 z = vec2(0.0, 0.0);
+    vec2 z = (gl_FragCoord.xy - originWindowCoords) / scaleFactor;
 
     int iterationCount = 0;
     while (dot(z, z) <= threshold && iterationCount < MAX_ITERATIONS) {

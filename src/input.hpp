@@ -2,11 +2,14 @@
 #include <GLFW/glfw3.h>
 
 #include "cursor.hpp"
+#include "shader.hpp"
 
 extern size_t windowWidth, windowHeight;
 
 extern float scaleFactor;
 extern double originX, originY;
+
+extern Shader mandelShader;
 
 namespace input_handler {
     inline bool dragging = false;

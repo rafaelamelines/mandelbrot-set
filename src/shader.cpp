@@ -5,6 +5,8 @@ Shader::~Shader() {
 }
 
 void Shader::load(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) {
+    glDeleteProgram(shaderProgram);
+
     auto vertexShader = createShader(GL_VERTEX_SHADER, vertexShaderPath);
     auto fragmentShader = createShader(GL_FRAGMENT_SHADER, fragmentShaderPath);
 
@@ -24,7 +26,7 @@ void Shader::load(const std::string& vertexShaderPath, const std::string& fragme
 
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &programSuccess);
 
-    if(!programSuccess) {
+    if (!programSuccess) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, programInfoLog);
         MANDEL_ERROR("Error: Shader could not be loaded: ", programInfoLog);
     }
