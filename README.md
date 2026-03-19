@@ -3,15 +3,15 @@
 [![MacOS](https://github.com/rafaelamelines/mandelbrot-set/actions/workflows/macos.yml/badge.svg)](https://github.com/rafaelamelines/mandelbrot-set/actions/workflows/macos.yml)
 [![Windows](https://github.com/rafaelamelines/mandelbrot-set/actions/workflows/windows.yml/badge.svg)](https://github.com/rafaelamelines/mandelbrot-set/actions/workflows/windows.yml)
 
-Performant rendering of the Mandelbrot Set using OpenGL.
+Performant rendering of Mandelbrot and Julia sets using OpenGL.
 
 <img width="1448" height="1048" alt="mandelbrot" src="https://github.com/user-attachments/assets/aa600476-5698-449c-8bdb-615a13247abf" />
 
 ## Controls
-Scroll to zoom, click and drag to pan.
+Scroll to zoom, click and drag to pan, right click to view the Julia set for a particular point.
 
 ## Building
-If you want to build the app yourself, you can use CMake. Make sure you do a recursive clone.
+If you want to build the app yourself, you can use CMake. Make sure you do a recursive clone, as some of the dependencies are included as submodules.
 ```
 mkdir build
 cd build

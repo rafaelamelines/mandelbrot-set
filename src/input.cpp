@@ -49,8 +49,6 @@ void input_handler::mouse_button_callback(GLFWwindow* window, int button, int ac
 
             populateColours(mandelShader);
 
-            MANDEL_LOG("Rendering Julia set with c, ", (float)(cursorX - originX) / scaleFactor, " + ", (float)(cursorY - originY) / scaleFactor, "i.");
-
             GLint cUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "c");
             glUniform2f(cUniform, (float)(cursorX - originX) / scaleFactor, (float)(cursorY - originY) / scaleFactor);
         }

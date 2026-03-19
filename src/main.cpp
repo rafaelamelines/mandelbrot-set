@@ -134,9 +134,7 @@ int main() {
 
         ImGui::Text(julia ? "Multi-Julia set with exponent" : "Multibrot set with exponent");
         static float p = 2.0f;
-        if (ImGui::SliderFloat("##multibrot", &p, 0.0f, 10.0f))
-            if (p < 0.0f)
-                p = 0.0f;
+        ImGui::SliderFloat("##multibrot", &p, 0.0f, 10.0f);
 
         ImGui::SameLine();
 
@@ -257,9 +255,6 @@ int main() {
 
         GLint pUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "p");
         glUniform1f(pUniform, p);
-
-        GLint windowDimensionsUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "WINDOW_DIMENSIONS");
-        glUniform2f(windowDimensionsUniform, (float)windowWidth, (float)windowHeight);
 
         GLint scaleFactorUniform = glGetUniformLocation(mandelShader.getShaderProgram(), "scaleFactor");
         glUniform1f(scaleFactorUniform, scaleFactor);
